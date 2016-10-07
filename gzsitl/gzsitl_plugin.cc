@@ -163,6 +163,16 @@ void GZSitlPlugin::OnUpdate()
             subs_targ_pos.y, subs_targ_pos.x, -subs_targ_pos.z, 0, 0, 0));
     }
 
+    // TODO: Just to test other mavlink_vehicles routines
+    if (gazebo::physics::ModelPtr brake_target =
+            model->GetWorld()->GetModel("brake")) {
+        this->brake_target_pose = brake_target->GetWorldPose();
+    }
+    if (gazebo::physics::ModelPtr rotate_target =
+            model->GetWorld()->GetModel("rotate")) {
+        this->rotate_target_pose = rotate_target->GetWorldPose();
+    }
+
     // Execute according to simulation state
     switch (simstate) {
     case INIT: {
@@ -197,16 +207,6 @@ void GZSitlPlugin::OnUpdate()
         if (!TAKEOFF_AUTO) {
             simstate = ACTIVE_ON_GROUND;
             print_debug_state("state: ACTIVE_ON_GROUND\n");
-            break;
-        }
-
-        if (mod != mode::GUIDED) {
-            this->mav->set_mode(mode::GUIDED);
-            break;
-        }
-
-        if (arm_stat != arm_status::ARMED) {
-            this->mav->arm_throttle();
             break;
         }
 
@@ -255,8 +255,18 @@ void GZSitlPlugin::OnUpdate()
                                                 this->subs_target_pose.pos.x,
                                                 -this->subs_target_pose.pos.z),
                     this->home_position);
-            this->mav->send_detour_waypoint(global_coord, false, false);
+            this->mav->send_detour_waypoint(global_coord, true, false);
             this->subs_target_pose_prev = this->subs_target_pose;
+        }
+
+        // TODO: Just to test other mavlink_vehicles routines
+        if (this->brake_target_pose != this->brake_target_pose_prev) {
+            this->mav->brake(true);
+            this->brake_target_pose_prev = this->brake_target_pose;
+        }
+        if (this->rotate_target_pose != this->rotate_target_pose_prev) {
+            this->mav->rotate(-M_PI/2, true);
+            this->rotate_target_pose_prev = this->rotate_target_pose;
         }
 
         break;
