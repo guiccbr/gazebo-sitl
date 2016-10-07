@@ -243,7 +243,7 @@ void GZSitlPlugin::OnUpdate()
                                                 this->perm_target_pose.pos.x,
                                                 -this->perm_target_pose.pos.z),
                     this->home_position);
-            this->mav->send_mission_waypoint(global_coord, true);
+            this->mav->send_mission_waypoint(global_coord, false);
             this->perm_target_pose_prev = this->perm_target_pose;
         }
 
@@ -255,7 +255,7 @@ void GZSitlPlugin::OnUpdate()
                                                 this->subs_target_pose.pos.x,
                                                 -this->subs_target_pose.pos.z),
                     this->home_position);
-            this->mav->send_detour_waypoint(global_coord, true);
+            this->mav->send_detour_waypoint(global_coord, false, false);
             this->subs_target_pose_prev = this->subs_target_pose;
         }
 
